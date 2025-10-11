@@ -1,0 +1,29 @@
+{
+  "tag": "v5.21.0-rc.1",
+  "repository": "timbuilt-DB/Jobtread-Integrations",
+  "mirrored_at": "2025-10-11T23:31:48Z",
+  "artifacts": {
+    "sbom": {
+      "file": "sbom.json",
+      "sha256": "e3fef82ccf9a9f387da3c585d8298f952423d13446f52e6e6426bc2947630d98"
+    },
+    "checksums": {
+      "file": "checksums.txt",
+      "sha256": "ddacec4670337573879bf1b7a1cfc9251a3e7a7f999c76919af34ef2eff6c9be"
+    },
+    "release": {
+      "file": "release.json",
+      "sha256": "8f81053c6d4a54f5323f1d25ae3f8c0474ed617812e0800e8b99a4478a82956a"
+    }
+  },
+  "signatures": {
+    "sbom": "tags/v5.21.0-rc.1/sbom.sig",
+    "checksums": "tags/v5.21.0-rc.1/checksums.sig"
+  },
+  "verification": {
+    "release_url": "https://github.com/timbuilt-DB/Jobtread-Integrations/releases/tag/v5.21.0-rc.1",
+    "attestation_url": "https://github.com/timbuilt-DB/Jobtread-Integrations/attestations",
+    "sigstore_oidc_issuer": "https://token.actions.githubusercontent.com",
+    "sigstore_identity": "https://github.com/timbuilt-DB/Jobtread-Integrations/.github/workflows/release.yml@refs/tags/v5.21.0-rc.1"
+  }
+}

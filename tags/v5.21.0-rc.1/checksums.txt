@@ -1,0 +1,2 @@
+37aead82a5463d1d0f16fd325fa7135639e1ad656beb494f0f48b4f37fa5d4d1  jobtread-integrations-v5.21.0-rc.1.tar.gz
+e3fef82ccf9a9f387da3c585d8298f952423d13446f52e6e6426bc2947630d98  sbom.json
