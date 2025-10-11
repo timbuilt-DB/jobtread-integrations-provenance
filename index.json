@@ -1,0 +1,12 @@
+{
+  "repository": "timbuilt-DB/Jobtread-Integrations",
+  "mirror_repository": "timbuilt-DB/jobtread-integrations-provenance",
+  "description": "Public mirror of provenance artifacts from private repository",
+  "releases": [
+    {
+      "tag": "v5.19.1-rc.2",
+      "mirrored_at": "2025-10-11T16:34:52Z",
+      "path": "tags/v5.19.1-rc.2"
+    }
+  ]
+}
