@@ -4,6 +4,14 @@
   "description": "Public mirror of provenance artifacts from private repository",
   "releases": [
     {
+      "tag": "v5.22.0-rc.5",
+      "mirrored_at": "2025-10-12T23:47:55Z",
+      "path": "tags/v5.22.0-rc.5",
+      "has_signatures": true,
+      "has_attestations": true,
+      "has_slsa": true
+    },
+    {
       "tag": "v5.21.0-rc.2",
       "mirrored_at": "2025-10-12T12:56:15Z",
       "path": "tags/v5.21.0-rc.2",

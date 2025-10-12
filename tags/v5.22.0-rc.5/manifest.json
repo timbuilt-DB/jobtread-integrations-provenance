@@ -1,0 +1,14 @@
+{
+  "tag": "v5.22.0-rc.5",
+  "commit": "c878983fb2a0fd020ce99922ecb5ff73fc2df02f",
+  "repository": "timbuilt-DB/Jobtread-Integrations",
+  "mirrored_at": "2025-10-12T23:47:54Z",
+  "slsa_attestation": "tags/v5.22.0-rc.5/slsa.att",
+  "has_slsa": true,
+  "assets": ["slsa.att"],
+  "verification": {
+    "release_url": "https://github.com/timbuilt-DB/Jobtread-Integrations/releases/tag/v5.22.0-rc.5",
+    "sigstore_oidc_issuer": "https://token.actions.githubusercontent.com",
+    "sigstore_identity_pattern": "https://github.com/timbuilt-DB/Jobtread-Integrations/.github/workflows/release-manager.yml@refs/tags/v5.22.0-rc.5"
+  }
+}
