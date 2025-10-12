@@ -17,6 +17,13 @@
       "has_signatures": true
     },
     {
+      "tag": "v5.21.0",
+      "mirrored_at": "2025-10-12T13:10:28Z",
+      "path": "tags/v5.21.0",
+      "has_signatures": true,
+      "has_attestations": true
+    },
+    {
       "tag": "v5.19.1-rc.2",
       "mirrored_at": "2025-10-11T16:34:52Z",
       "path": "tags/v5.19.1-rc.2"
