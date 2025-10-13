@@ -12,6 +12,14 @@
       "has_slsa": true
     },
     {
+      "tag": "v5.22.0-rc.6",
+      "mirrored_at": "2025-10-13T00:13:13Z",
+      "path": "tags/v5.22.0-rc.6",
+      "has_signatures": true,
+      "has_attestations": true,
+      "has_slsa": true
+    },
+    {
       "tag": "v5.22.0-rc.5",
       "mirrored_at": "2025-10-12T23:47:55Z",
       "path": "tags/v5.22.0-rc.5",
