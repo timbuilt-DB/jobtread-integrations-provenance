@@ -1,0 +1,21 @@
+{
+  "source_type": "email.inbound",
+  "source_system": "email",
+  "source_id": "email:MSG12345",
+  "artifact_type": "email_message",
+  "job_id": "22PKCUGRwQGg",
+  "job_name": "ZZ / ZZT Fixture Job",
+  "author": "client@example.com",
+  "created_at": "2025-11-28T10:15:00Z",
+  "room": "Kitchen",
+  "element": "Cabinets",
+  "notes": "We'd like to confirm the cabinet layout for the kitchen and add a pull-out trash can next to the sink.",
+  "file_url": null,
+  "attachments": [],
+  "raw_context": {
+    "messageId": "<MSG12345@example.com>",
+    "subject": "[22PKCUGRwQGg] Kitchen cabinet changes"
+  },
+  "capture_version": "capture_payload_v1",
+  "debug_trace_id": "cap-email-2025-11-28T10:15:00Z-abc123"
+}
