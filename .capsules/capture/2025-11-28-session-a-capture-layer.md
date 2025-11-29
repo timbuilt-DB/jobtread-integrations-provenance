@@ -1,3 +1,100 @@
-# Session A - Capture Layer Implementation (JobTread Integrations)
+# Session A - Capture Layer Implementation (Derived)
 
-Date: 2025-11-28\nSession: A (Capture Layer)\nStatus: draft\nVersion: v1\nCapsule Type: capture\n\nThis capsule syncs the Session A Capture Layer design into the JobTread Integrations provenance repo. It defines the Airtable Intake schema, CapturePayload v1, source taxonomy, capture routes, and drift guard blueprint.\n\n---\n\n## 1. Airtable Intake Schema (Validated)\n\n**Base ID**: appkXIMhPS34Lm7tF\n**Table**: IntakeItems\n\nFields:\n- `source_id` (singleLineText, primary)\n- `notes` (multilineText)\n- `author` (singleLineText)\n- `job_id` (singleLineText)\n- `job_name` (singleLineText)\n- `artifact_type` (singleLineText)\n- `created_at` (singleLineText)\n- `room` (singleLineText)\n- `element` (singleLineText)\n- `file_url` (singleLineText)\n- `Attachments` (multipleAttachments)\n- `Attachment Summary` (aiText)\n\n**Known drift**: Upstream filter formula currently references `jobid` while Airtable field is `job_id`. All new work must use `job_id` and CI should guard against `jobid`.\n\n---\n\n## 2. Intake Source Taxonomy\n\n### 2.1 `source_type` enum\n- `fireflies.meeting`\n- `bubbles.note`\n- `email.inbound`\n- `photo.ocr`\n- `jt.daily_log`\n- `jt.other`\n- `manual`\n- `other`\n\n### 2.2 `artifact_type` enum\n- `meeting_transcript`\n- `meeting_summary`\n- `voice_note`\n- `email_message`\n- `photo`\n- `photo_ocr_text`\n- `jt_daily_log`\n- `document`\n- `other`\n\nThese enums are used in the CapturePayload schema and enforced by fixtures/CI, not yet as Airtable enum fields.\n\n---\n\n## 3. CapturePayload v1 (Canonical Ingestion Schema)\n\nEvery capture route produces a CapturePayload object before mapping into Airtable.\n\n```jsonc\n{\n  \"source_type\": \"fireflies.meeting\",\n  \"source_system\": \"fireflies\",\n  \"source_id\": \"fireflies:call_123\",\n  \"artifact_type\": \"meeting_transcript\",\n\n  \"job_id\": \"22PKCUGRwQGg\",\n  \"job_name\": \"ZZ / ZZT Fixture Job\",\n\n  \"author\": \"host@example.com\",\n  \"created_at\": \"2025-11-28T15:23:00Z\",\n\n  \"room\": \"Kitchen\",\n  \"element\": \"Cabinets\",\n\n  \"notes\": \"Raw or lightly structured text\",\n  \"file_url\": \"https://...\",\n  \"attachments\": [\n    {\n      \"url\": \"https://...\",\n      \"filename\": \"photo_123.jpg\",\n      \"content_type\": \"image/jpeg\"\n    }\n  ],\n\n  \"raw_context\": {},\n  \"capture_version\": \"capture_payload_v1\",\n  \"debug_trace_id\": \"cap-2025-11-28T15:23:00Z-xyz\"\n}\n```\n\n### 3.1 Mapping CapturePayload → Airtable `IntakeItems`\n\n- `source_id` → `source_id`\n- `notes` → `notes`\n- `author` → `author`\n- `job_id` → `job_id`\n- `job_name` → `job_name`\n- `artifact_type` → `artifact_type`\n- `created_at` → `created_at`\n- `room` → `room`\n- `element` → `element`\n- `file_url` → `file_url`\n- `attachments[]` → `Attachments`\n\n---\n\n## 4. Capture Routes (Specs)\n\nAll routes follow the same pattern: source system → Make scenario → CapturePayload v1 → Airtable IntakeItems (dry-run).\n\n### 4.1 Fireflies → Make → Airtable\n- Trigger: Fireflies webhook when call/summary is ready.\n- Normalization: build CapturePayload with `source_type=fireflies.meeting`, `source_id=fireflies:<call_id>`, transcript/summary in `notes`, optional recording links/attachments.\n- Load: Airtable upsert by `source_id` in dry-run mode.\n\n### 4.2 Bubbles → Make → Airtable\n- Trigger: Bubbles webhook on note/board completion/tag.\n- Normalization: CapturePayload with `source_type=bubbles.note`, transcription or note text in `notes`, attachments for audio/visuals.\n- Load: Airtable upsert by `source_id` in dry-run mode.\n\n### 4.3 Email → IntakeItems\n- Trigger: Email to intake alias.\n- Normalization: Parse headers/body, optionally call Intake AI to structure content, emit one or more CapturePayloads with `source_type=email.inbound`, `artifact_type=email_message`, `source_id=email:<messageId>[:index]`.\n- Load: Airtable upsert by `source_id` in dry-run mode.\n\n### 4.4 Photos/OCR → IntakeItems\n- Trigger: New image in watched folder/bucket.\n- Normalization: OCR text, optionally run Intake AI, CapturePayload with `source_type=photo.ocr`, `artifact_type=photo_ocr_text`, image as attachment.\n- Load: Airtable upsert by `source_id` in dry-run mode.\n\n### 4.5 JobTread Daily Logs → IntakeItems\n- Trigger: Scheduled poll or JT webhook for Daily Logs (via Pave query).\n- Normalization: CapturePayload with `source_type=jt.daily_log`, `source_id=jt_daily_log:<log_id>`, log text in `notes`, photos as attachments, `job_id`/`job_name` from JT.\n- Load: Airtable upsert by `source_id` in dry-run mode.\n\n---\n\n## 5. Drift Guard Blueprint\n\n### 5.1 Airtable Schema Guard\n- Maintain canonical IntakeItems schema (fields and types) in code.\n- CI step: fetch live Airtable schema via MCP and compare.\n- Fail CI if:\n  - `job_id` field missing or renamed.\n  - Any references to `jobid` remain.\n  - Required fields diverge from canonical schema.\n\n### 5.2 Make Blueprint Drift Guard\n- Store canonical Make blueprints for each capture scenario in a code repo.\n- CI step: call `make.get_blueprint_drift_bundle` to compare live Make scenarios vs repo blueprints.\n- Fail CI on module removal, remapped outputs, or other critical drift.\n\n### 5.3 CapturePayload Schema Guard\n- Define JSON schema for `capture_payload_v1`.\n- Unit tests validate example payloads from fixtures against the schema.\n- Version bump required (`capture_version`) when schema changes.\n\n---\n\n## 6. Session A Scope in this Repo\n\nThis capsule only establishes provenance for the Capture Layer design in the JobTread Integrations context.\nImplementation code and Make scenario blueprints live in the main automation repos; this file acts as the authoritative narrative and reference for provenance and CI guardrail design.\n
+> **Derived from canonical capsule:** `timbuilt-DB/Automation_Protocols/active/2025-11-28--session-a-capture-layer.md`\n> This file is a derived summary for provenance only. Canonical source of truth lives in `Automation_Protocols`.
+
+Date: 2025-11-28
+Session: A (Capture Layer)
+Status: draft
+Version: v1
+Capsule Type: capture-derived
+
+This capsule syncs the Session A Capture Layer design into the JobTread Integrations provenance repo as a derived view. It must not be edited as the primary spec; instead, edits should be applied to the canonical capsule in `Automation_Protocols` and optionally reflected here.
+
+---
+
+## 1. Airtable Intake Schema (Summary)
+
+See canonical capsule for full details.
+
+- Base ID: `appkXIMhPS34Lm7tF`
+- Table: `IntakeItems`
+- Key fields: `source_id`, `notes`, `author`, `job_id`, `job_name`, `artifact_type`, `created_at`, `room`, `element`, `file_url`, `Attachments`, `Attachment Summary`.
+- Known drift: filter formula referenced `jobid` while Airtable field is `job_id`.
+
+---
+
+## 2. Source Taxonomy (Summary)
+
+### `source_type` enum (examples)
+- `fireflies.meeting`
+- `bubbles.note`
+- `email.inbound`
+- `photo.ocr`
+- `jt.daily_log`
+- `jt.other`
+- `manual`
+- `other`
+
+### `artifact_type` enum (examples)
+- `meeting_transcript`
+- `meeting_summary`
+- `voice_note`
+- `email_message`
+- `photo`
+- `photo_ocr_text`
+- `jt_daily_log`
+- `document`
+- `other`
+
+---
+
+## 3. CapturePayload v1 (Summary)
+
+CapturePayload v1 is the canonical ingestion schema used by all capture routes before mapping into Airtable. It defines fields such as:
+
+- `source_type`, `source_system`, `source_id`, `artifact_type`
+- `job_id`, `job_name`
+- `author`, `created_at`
+- `room`, `element`
+- `notes`, `file_url`, `attachments[]`
+- `raw_context`, `capture_version`, `debug_trace_id`
+
+See canonical capsule for the exact JSON schema and mapping rules.
+
+---
+
+## 4. Capture Routes (Summary)
+
+This derived capsule records the existence of five capture routes, with full specs in the canonical capsule:
+
+1. Fireflies → Make → Airtable
+2. Bubbles → Make → Airtable
+3. Email → IntakeItems
+4. Photos/OCR → IntakeItems
+5. JobTread Daily Logs → IntakeItems
+
+Each route:
+- Normalizes its source into CapturePayload v1.
+- Upserts (or dry-runs) into Airtable IntakeItems keyed by `source_id`.
+
+---
+
+## 5. Drift Guard Blueprint (Summary)
+
+The canonical capsule defines drift guards for:
+
+- Airtable schema (IntakeItems)
+- Make scenario blueprints
+- CapturePayload schema
+
+This file simply notes their existence; implementation details and updates must be maintained in `Automation_Protocols`.
+
+---
+
+## 6. Governance Note
+
+This file exists only as a provenance-friendly summary.
+
+- Do not add new canonical design decisions here.
+- Do not treat this as the source of truth for Intake/SOW or Capture.
+- For any edits or new behavior, update the canonical capsule in `Automation_Protocols/active/` and then, if needed, refresh this summary via PR.
