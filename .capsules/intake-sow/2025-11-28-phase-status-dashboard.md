@@ -1,31 +1,35 @@
+# Intake/SOW Phase Status Dashboard (Derived)
+
+> **Derived from canonical capsule:** `timbuilt-DB/Automation_Protocols/active/5xx_Pipelines/intake-sow-pipeline.md`\n> This file is a derived dashboard view for provenance only. Canonical source of truth for Intake/SOW phase definitions and status logic lives in `Automation_Protocols`.
+
+Date: 2025-11-28
+Status: draft
+Version: v1
+Capsule Type: intake-sow-derived
+
+This capsule describes a phase status dashboard for the Intake/SOW pipeline in a provenance-friendly way. It must not be edited as the primary spec; instead, edits should be applied to the canonical capsule in `Automation_Protocols` and, if needed, reflected here.
+
 ---
-title: "Intake/SOW Phase Status Dashboard"
-date: "2025-11-28"
-role: "Session F — Intake/SOW Operations & Observability"
+
+## 1. Canonical Phase Definitions
+
+- Repository: `timbuilt-DB/Automation_Protocols`
+- Path: `active/5xx_Pipelines/intake-sow-pipeline.md`
+
+That capsule defines the phases, transitions, and status semantics for Intake/SOW.
+
 ---
 
-# Intake/SOW Phase Status Dashboard
+## 2. Role of This Derived Capsule
 
-This capsule is the single-pane status view for Intake/SOW as of **2025-11-28**. It summarizes layers, ownership, and what is done vs in progress vs next.
+- Provides a dashboard-oriented view of those phases and statuses.
+- Useful for operators and provenance, but not as the canonical definition.
 
-## Layer Summary
+For complete logic and evolution of phases, refer to the canonical capsule.
 
-| Layer | Repo(s) | Status | Notes |
-| --- | --- | --- | --- |
-| Capture | `jobtread-integrations-provenance` | A: partially automated | Email stream spec + fixtures done; ZZ job daily-log fixture planned as input |
-| AI Layer | `jobtread-integrations-provenance` / `Jobtread-Integrations` | B: design done, impl WIP | AI-layer capsules drafted; mapping/tests to be wired into CI |
-| SOW Engine | `Jobtread-Integrations` | C: capsules ready, engine WIP | SOW draft builder + publisher capsules drafted; dry-run path being implemented |
+---
 
-## Phase 2 checklist
+## 3. Governance Note
 
-- [ ] Capture: schemas finalized and versioned.
-- [ ] Capture: fixtures complete for ZZ job `22PKCUGRwQGg`.
-- [ ] Capture: CI checks for schema/fixture drift.
-- [ ] AI: engine implemented behind stable interfaces.
-- [ ] AI: tests (classification/mapping/sectioning) integrated into CI.
-- [ ] SOW: dry-run workflow green on ZZ fixture.
-- [ ] SOW: apply-mode guarded rollout plan agreed.
-
-## Links and references
-
-See `.capsules/intake-sow/2025-11-28-capsule-index.md` for the full cross-repo capsule index.
+- Do not add new canonical Intake/SOW phase definitions here.
+- For changes to phases or status logic, update the canonical capsule in `Automation_Protocols`, then refresh this derived view via PR if desired.
